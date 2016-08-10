@@ -1,0 +1,17 @@
+x<-read.table("household_power_consumption.txt",sep=";",header=TRUE)
+x$Date<-as.Date(x$Date,format="%d/%m/%Y")
+y<-subset(x,Date=="2007-02-01"|Date=="2007-02-02")
+y$Dates<-strptime(paste(y$Date,y$Time),"%Y-%m-%d %H:%M:%S")
+
+library(tidyr)
+subest<-select(y,Dates,Sub_metering_1,Sub_metering_2,Sub_metering_3)
+subset$Dates<-as.POSIXct(subset$Dates)
+gathered<-gather(subset,key= class,value= metering, -Dates)
+
+png("plot3.png",width=480,height=480)
+with(gathered,plot(Dates,metering,xlab="",ylab="Energy sub metering",type="n"))
+with(subset(gathered,class=="Sub_metering_1"),points(Dates,metering,col="black",type="l"))
+with(subset(gathered,class=="Sub_metering_2"),points(Dates,metering,col="red",type="l"))
+with(subset(gathered,class=="Sub_metering_3"),points(Dates,metering,col="blue",type="l"))
+legend("topright",lwd=c(1,1,1),col=c("black","red","blue"),legend=c("Sub_metering_1","Sub_metering_2","Sub_metering_3"))
+dev.off()
